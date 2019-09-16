@@ -1,0 +1,78 @@
+ID: test01
+_schema-version: '2.1'
+version: 0.0.1
+modules:
+  - name: db01
+    type: hdb
+    path: db01
+    requires:
+      - name: hdi_db01
+        properties:
+          TARGET_CONTAINER: '~{hdi-container-name}'
+      - name: external_access
+        group: SERVICE-REPLACEMENTS
+        properties:
+          service: '~{ups-service-name}'
+  - name: node01
+    type: nodejs
+    path: node01
+    provides:
+      - name: node01_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: hdi_db01
+      - name: db01
+      - name: hdi_uaa
+  - name: node02
+    type: nodejs
+    path: node02
+    provides:
+      - name: node02_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: hdi_db01
+      - name: db01
+  - name: web
+    type: html5
+    path: web
+    parameters:
+      disk-quota: 256M
+      memory: 256M
+    build-parameters:
+      builder: grunt
+    requires:
+      - name: hdi_uaa
+      - name: node01_api
+        group: destinations
+        properties:
+          name: srv_api
+          url: '~{url}'
+          forwardAuthToken: true
+resources:
+  - name: hdi_db01
+    properties:
+      hdi-container-name: '${service-name}'
+    type: com.sap.xs.hdi-container
+  - name: external_access
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: CC_ACCESS
+    properties:
+      ups-service-name: '${service-name}'
+  - name: hdi_uaa
+    type: com.sap.xs.uaa-space
+    parameters:
+      path: ./xs-security.json
+  - name: uaa_test01
+    parameters:
+      path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+    type: org.cloudfoundry.managed-service
+  - name: dest_test01
+    parameters:
+      service-plan: lite
+      service: destination
+    type: org.cloudfoundry.managed-service

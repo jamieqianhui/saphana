@@ -1,0 +1,7 @@
+column table "test01.db01::text" (
+	"EMPID" INTEGER unique not null COMMENT 'Employee ID',
+	"EVALUATION_RATING" DOUBLE COMMENT 'Evaluation results',
+	PRIMARY KEY ("EMPID")
+)
+COMMENT 'Performance evaluation record'
+

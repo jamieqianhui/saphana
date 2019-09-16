@@ -1,0 +1,8 @@
+{
+  "test01.db01::vt_text_table": {
+    "target": {
+      "remote": "FE_SIN_TEXT",
+      "object": "db01_TEXT"
+    }
+  }
+}
